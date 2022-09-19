@@ -1,0 +1,1 @@
+streamlit run dashboard/🏠_Huizenprijs\ voorspeller.py
