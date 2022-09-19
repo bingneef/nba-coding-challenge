@@ -9,6 +9,11 @@ Install all the packages
 pip install -r requirements.txt
 ```
 
+## Generate models
+```
+python model.py
+```
+
 ## Starting the dashboard
 ```
 ./run_dashboard.sh
