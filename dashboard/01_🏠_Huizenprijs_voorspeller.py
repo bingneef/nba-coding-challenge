@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from lib.predict import regression, decision_tree, neural_network
+from lib.predict import regression, decision_tree, neural_network, X_from_user_inputs
 
 
 st.markdown("# Huizenprijs voorspeller 🏠")
@@ -9,7 +9,7 @@ st.sidebar.markdown("""
     TODO
 """)
 
-def month_number_from_month(month):
+def month_to_month_number(month):
     return {
         "januari": 1,
         "februari": 2,
@@ -50,12 +50,11 @@ with col3:
 
 
 # TODO: determine predicting features
-X = [
-    month_number_from_month(mo_sold), 
-    yr_sold, 
-    living_area
-]
-
+X = X_from_user_inputs(
+    month_sold=month_to_month_number(mo_sold),
+    year_sold=yr_sold,
+    living_area=living_area
+)
 
 # Show calculated results
 col1, col2, col3 = st.columns(3)

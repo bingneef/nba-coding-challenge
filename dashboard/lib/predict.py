@@ -1,6 +1,17 @@
 import streamlit as st
+import pandas as pd
 from joblib import load
 
+
+def X_from_user_inputs(month_sold, year_sold, living_area):
+    return pd.DataFrame(
+        {
+            'Mo Sold': month_sold, 
+            'Yr Sold': year_sold,
+            'Gr Liv Area': living_area
+        }, 
+        index=[0]
+    ).iloc[0]
 
 @st.cache
 def regression(X):
