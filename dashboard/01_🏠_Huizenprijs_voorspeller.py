@@ -1,68 +1,134 @@
 import streamlit as st
-import pandas as pd
-from lib.predict import regression, decision_tree, neural_network, X_from_user_inputs
+from lib.predict import regression, decision_tree, neural_network, xgboost, X_from_user_inputs
+
+
+st.set_page_config(
+    page_title="Huizenprijs voorspeller 🏠",
+    layout="wide"
+)
 
 
 st.markdown("# Huizenprijs voorspeller 🏠")
-st.sidebar.markdown("""
-    # Huizenprijs voorspeller 🏠
-    TODO
-""")
-
-def month_to_month_number(month):
-    return {
-        "januari": 1,
-        "februari": 2,
-        "maart": 3,
-        "april": 4,
-        "mei": 5,
-        "juni": 6,
-        "juli": 7,
-        "augustus": 8,
-        "september": 9,
-        "oktober": 10,
-        "november": 11,
-        "december": 12
-    }[month]
-
-
-def result_markdown(title, result):
-    st.markdown(f"""
-    {title}\\
-    **${"{:.2f}".format(result)}**
-    """)
-
+st.markdown("## Invoervelden")
+extended_input = st.checkbox("Alle velden tonen", value=False)
 
 # Show user inputs
+container = st.container()
+container.markdown("### Algemeen")
 col1, col2, col3 = st.columns(3)
 with col1:
-    mo_sold = st.selectbox(
-        'Verkoop maand',
-        ("januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"),
-        index=0
+    overall_quality = st.slider('Wat is de staat van het huis?', min_value=1, max_value=10, step=1, value=6)
+
+if extended_input is True:
+    container = st.container()
+    container.markdown("### De buitenkant")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        garage_area = st.slider("Hoe groot is de garage? (sqft)", min_value=0, max_value=5_000, step=1, value=500)
+
+    with col2:
+        garage_cars = st.slider("Hoeveel auto's passen in de garage?", min_value=0, max_value=10, step=1, value=2)
+
+    with col3:
+        lot_frontage = st.slider(
+            "Hoeveel grenst het aan de weg? (ft)",
+            min_value=0,
+            max_value=1_000,
+            step=1,
+            value=60
+        )
+else:
+    garage_area = 500
+    garage_cars = 2
+    lot_frontage = 60
+
+container = st.container()
+container.markdown("### De binnenkant")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    living_area = st.slider(
+        "Hoe groot is het totale woonoppervlak? (sqft)",
+        min_value=0,
+        max_value=10_000,
+        step=1,
+        value=1_500
     )
 
-with col2:
-    yr_sold = st.slider('Verkoop jaar', min_value=2010, max_value=2020, step=1, value=2020)
+if extended_input is True:
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        basement_area = st.slider(
+            "Hoe groot is de kelder? (sqft)",
+            min_value=0,
+            max_value=10_000,
+            step=1,
+            value=1_000
+        )
 
-with col3:
-    living_area = st.slider('Woonoppervlak (sqft)', min_value=1, max_value=7_500, step=1, value=1_500)
+    with col2:
+        first_floor_area = st.slider(
+            "Hoe groot is de begane grond? (sqft)",
+            min_value=0,
+            max_value=10_000,
+            step=1,
+            value=1_250
+        )
+
+    with col3:
+        second_floor_area = st.slider(
+            "Hoe groot is de eerste verdieping? (sqft)",
+            min_value=0,
+            max_value=3_000,
+            step=1,
+            value=350
+        )
+
+else:
+    basement_area = 1_000
+    first_floor_area = 1_250
+    second_floor_area = 350
 
 
-# TODO: determine predicting features
 X = X_from_user_inputs(
-    month_sold=month_to_month_number(mo_sold),
-    year_sold=yr_sold,
+    overall_quality=overall_quality,
+    garage_cars=garage_cars,
+    garage_area=garage_area,
+    lot_frontage=lot_frontage,
+    basement_area=basement_area,
+    first_floor_area=first_floor_area,
+    second_floor_area=second_floor_area,
     living_area=living_area
 )
 
+st.markdown("## Resultaten")
+
+def format_currency(amount):
+    return f"${'{:,.2f}'.format(amount)}"
+
+
 # Show calculated results
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 with col1:
-    result_markdown("Regressie model", regression(X))
+    st.metric(
+        label='Regression',
+        value=format_currency(regression(X))
+    )
 
 with col2:
-    result_markdown("Decision tree model", decision_tree(X))
+    st.metric(
+        label='Decision Tree',
+        value=format_currency(decision_tree(X))
+    )
 
 with col3:
-    result_markdown("Neural network model", neural_network(X))
+    st.metric(
+        label='Xgboost',
+        value=format_currency(xgboost(X))
+    )
+
+with col4:
+    st.metric(
+        label='Neural Network',
+        value=format_currency(neural_network(X))
+    )

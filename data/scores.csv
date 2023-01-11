@@ -1,0 +1,5 @@
+,name,score,msqe
+0,regression,0.804,37791.30
+1,decision_tree,0.804,37832.33
+2,xgboost,0.863,31608.44
+3,neural_network,0.691,47445.90
