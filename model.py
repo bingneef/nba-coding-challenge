@@ -7,7 +7,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-
+ # Example project
+ # This makes no changes to the code base
+ # VS and GIT sync?
 
 BASE_NUMERIC_FEATURES = [
     'Overall Qual',
